@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: movies_crs_postgres
+    restart: unless-stopped
+    env_file:
+      - ./env/.env.postgres
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # FastAPI app. Optional: only starts with `--profile app`, so the default
+  # `docker compose up -d` brings up just Postgres for loading the data.
+  crs:
+    build:
+      context: ..
+      dockerfile: docker/crs/Dockerfile
+    container_name: movies_crs_app
+    profiles: ["app"]
+    restart: unless-stopped
+    env_file:
+      - ./env/.env.postgres   # db credentials
+      - ./env/.env.app        # host overrides (postgres host, ollama url, model)
+    ports:
+      - "${APP_HOST_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Lets the container reach Ollama running on the host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  pgdata:

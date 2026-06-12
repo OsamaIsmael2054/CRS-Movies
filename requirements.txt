@@ -1,0 +1,29 @@
+# Database / loader
+asyncpg
+pydantic
+pydantic-settings
+tqdm
+
+# API + LLM (used in later build steps)
+fastapi
+uvicorn[standard]
+httpx
+
+# Agent strategy (LangChain agent over Ollama)
+langchain>=1.0,<2.0
+langchain-ollama
+langgraph
+
+# CF retrieval / eval (used in later build steps)
+numpy
+scipy
+rapidfuzz
+
+# Tests
+pytest
+pytest-asyncio
+
+# Dev / formatting
+black
+isort
+pycodestyle
