@@ -20,3 +20,10 @@ class ChatRequest(BaseModel):
     mode: ChatMode = Field(
         default=ChatMode.FEWSHOT, description="Strategy used to answer."
     )
+    session_id: str | None = Field(
+        default=None,
+        description=(
+            "Conversation id. Prior turns for this session are looked up "
+            "server-side and fed back to the model; omit for a stateless turn."
+        ),
+    )

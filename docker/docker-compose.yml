@@ -1,3 +1,4 @@
+name: MoviesCRS
 services:
   postgres:
     image: postgres:18-alpine
@@ -5,6 +6,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./env/.env.postgres
+    environment:
+      PGDATA: /var/lib/postgresql/data
     ports:
       - "${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:

@@ -5,23 +5,38 @@ import asyncpg
 
 from src.clients.ollama import OllamaClient
 from src.routes.schemes.chat import ChatRequest
+from src.stores.sessions import SessionStore, Turn
 
 
 class RecommendationStrategy(ABC):
     """A recommendation strategy that streams a response token-by-token.
 
-    Strategies share the Ollama client and the asyncpg pool; each one differs
-    only in how it builds context and orchestrates the LLM call(s).
+    Strategies share the Ollama client, the asyncpg pool, and the conversation
+    session store; each one differs only in how it builds context and
+    orchestrates the LLM call(s).
     """
 
-    def __init__(self, llm: OllamaClient, pool: asyncpg.Pool) -> None:
+    def __init__(
+        self, llm: OllamaClient, pool: asyncpg.Pool, sessions: SessionStore
+    ) -> None:
         self.llm = llm
         self.pool = pool
+        self.sessions = sessions
 
     @abstractmethod
     def stream(self, request: ChatRequest) -> AsyncIterator[str]:
         """Yield response text chunks for the given request."""
         ...
+
+    def _turns(self, session_id: str | None) -> list[Turn]:
+        """Prior conversation turns for this session (empty if stateless)."""
+        return self.sessions.get(session_id)
+
+    def _remember(
+        self, session_id: str | None, user_message: str, reply: str
+    ) -> None:
+        """Persist this exchange so the next turn in the session sees it."""
+        self.sessions.append(session_id, user_message, reply)
 
     async def _history(self, user_id: str | None) -> list[str]:
         """Fetch the item ids this user has watched, from the interaction matrix.

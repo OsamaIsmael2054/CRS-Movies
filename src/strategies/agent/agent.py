@@ -3,6 +3,7 @@ from typing import AsyncIterator
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessageChunk, HumanMessage
 
+from src.clients.ollama import OllamaClient
 from src.routes.schemes.chat import ChatRequest
 from src.strategies.agent.tools import (
     create_recommend_tool,
@@ -33,10 +34,16 @@ class AgentStrategy(RecommendationStrategy):
         )
 
         user_message = build_user_message(watched, request.message)
+        prior_turns = OllamaClient._to_messages(self._turns(request.session_id))
+        messages = [*prior_turns, HumanMessage(content=user_message)]
+
+        parts: list[str] = []
         async for token, _meta in agent.astream(
-            {"messages": [HumanMessage(content=user_message)]},
+            {"messages": messages},
             stream_mode="messages",
         ):
             # Tool-calling steps emit no text, so only final answer tokens stream.
             if isinstance(token, AIMessageChunk) and token.content:
+                parts.append(str(token.content))
                 yield str(token.content)
+        self._remember(request.session_id, request.message, "".join(parts))

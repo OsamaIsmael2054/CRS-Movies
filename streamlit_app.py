@@ -1,28 +1,14 @@
-"""Streamlit test UI for the Movies-CRS API.
-
-Run the API first (``uvicorn src.main:app --port 8000``), then:
-
-    streamlit run streamlit_app.py
-
-It POSTs to ``/chat`` and streams the reply token-by-token. The request carries
-only ``user_id`` (plus the message and mode); the server looks that user's watch
-history up itself. The optional history preview in the sidebar reads Postgres
-directly, purely so you can see what the server will use.
-"""
-
-from __future__ import annotations
-
 import asyncio
+import uuid
 
 import requests
 import streamlit as st
 
-# Optional: direct DB access just to preview a user's history in the sidebar.
 try:
     from src.stores.database import connect
 
     _DB_AVAILABLE = True
-except Exception:  # pragma: no cover - app still works API-only
+except Exception:
     _DB_AVAILABLE = False
 
 DEFAULT_API = "http://localhost:8000"
@@ -82,6 +68,8 @@ st.set_page_config(page_title="Movies-CRS Tester", page_icon="🎬", layout="wid
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
 
 
 # --------------------------------------------------------------------------- #
@@ -124,6 +112,7 @@ st.caption(
 
 if st.button("🔄 Reset conversation"):
     st.session_state.messages = []
+    st.session_state.session_id = str(uuid.uuid4())  # start a fresh server-side session
     st.rerun()
 
 for msg in st.session_state.messages:
@@ -139,7 +128,12 @@ if prompt := st.chat_input("Ask for a recommendation…"):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    payload = {"message": prompt, "user_id": user_id, "mode": mode}
+    payload = {
+        "message": prompt,
+        "user_id": user_id,
+        "mode": mode,
+        "session_id": st.session_state.session_id,
+    }
     with st.chat_message("assistant"):
         try:
             reply = st.write_stream(stream_chat(api, payload))

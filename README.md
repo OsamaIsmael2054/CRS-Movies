@@ -78,13 +78,24 @@ curl -N -X POST http://localhost:8000/chat \
   -d '{
         "message": "I love old classic musicals. What should I watch next?",
         "user_id": "A30Q8X8B1S3GGT",
-        "mode": "rag"
+        "mode": "rag",
+        "session_id": "demo-1"
       }'
 ```
 
-The request carries only `user_id` (the server looks that user's watch history
-up itself) and `mode` (which selects the strategy). Responses stream
-token-by-token.
+The request carries `user_id` (the server looks that user's watch history up
+itself), `mode` (which selects the strategy), and an optional `session_id`.
+Responses stream token-by-token.
+
+### Multi-turn conversations
+
+Pass a `session_id` to make a request part of a conversation. All three
+strategies look the session's prior turns up server-side and feed them to the
+model alongside the current message, so follow-ups like *"tell me more about the
+second one"* resolve against earlier replies. History is kept **in memory**
+(`src/stores/sessions.py`, bounded to the most recent turns) and cleared on
+restart — swapping in a Postgres-backed store later only means keeping the same
+`get` / `append` interface. Omit `session_id` for a stateless, single-turn call.
 
 ## Two prompt changes that increase recommendation accuracy
 

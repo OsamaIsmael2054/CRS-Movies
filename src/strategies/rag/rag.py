@@ -20,10 +20,14 @@ class RagStrategy(RecommendationStrategy):
 
         messages = [
             {"role": "system", "content": RAG_SYSTEM_PROMPT},
+            *self._turns(request.session_id),
             {
                 "role": "user",
                 "content": build_rag_user_message(watched, candidates, request.message),
             },
         ]
+        parts: list[str] = []
         async for chunk in self.llm.stream_chat(messages):
+            parts.append(chunk)
             yield chunk
+        self._remember(request.session_id, request.message, "".join(parts))

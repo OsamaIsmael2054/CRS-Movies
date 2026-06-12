@@ -8,14 +8,22 @@ from src.strategies.agent.agent import AgentStrategy
 from src.strategies.base import RecommendationStrategy
 from src.strategies.fewShot.fewshot import FewShotStrategy
 from src.strategies.rag.rag import RagStrategy
+from src.stores.sessions import SessionStore
 
 
 class ChatController:
-    def __init__(self, llm: OllamaClient, pool: asyncpg.Pool) -> None:
+    def __init__(
+        self,
+        llm: OllamaClient,
+        pool: asyncpg.Pool,
+        sessions: SessionStore | None = None,
+    ) -> None:
+        sessions = sessions or SessionStore()
+        self.sessions = sessions
         self._strategies: dict[ChatMode, RecommendationStrategy] = {
-            ChatMode.FEWSHOT: FewShotStrategy(llm, pool),
-            ChatMode.RAG: RagStrategy(llm, pool),
-            ChatMode.AGENT: AgentStrategy(llm, pool),
+            ChatMode.FEWSHOT: FewShotStrategy(llm, pool, sessions),
+            ChatMode.RAG: RagStrategy(llm, pool, sessions),
+            ChatMode.AGENT: AgentStrategy(llm, pool, sessions),
         }
 
     def get(self, mode: ChatMode) -> RecommendationStrategy:
