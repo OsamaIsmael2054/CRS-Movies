@@ -1,7 +1,7 @@
 import asyncpg
 from rapidfuzz import fuzz, process
 
-from src.stores.cf import Candidate
+from stores.cf import Candidate
 
 
 async def search_titles(

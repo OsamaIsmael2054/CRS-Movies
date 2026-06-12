@@ -2,8 +2,8 @@ import asyncio
 
 import asyncpg
 
-from src.helpers.config import settings
-from src.helpers.io_utils import iter_jsonl, read_json
+from helpers.config import settings
+from helpers.io_utils import iter_jsonl, read_json
 
 
 async def _apply_schema(conn: asyncpg.Connection) -> None:

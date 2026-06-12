@@ -1,9 +1,9 @@
 from typing import AsyncIterator
 
-from src.routes.schemes.chat import ChatRequest
-from src.stores.cf import recommend
-from src.strategies.base import RecommendationStrategy
-from src.strategies.rag.prompts import RAG_SYSTEM_PROMPT, build_rag_user_message
+from routes.schemes.chat import ChatRequest
+from stores.cf import recommend
+from strategies.base import RecommendationStrategy
+from strategies.rag.prompts import RAG_SYSTEM_PROMPT, build_rag_user_message
 
 
 class RagStrategy(RecommendationStrategy):

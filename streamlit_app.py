@@ -5,7 +5,7 @@ import requests
 import streamlit as st
 
 try:
-    from src.stores.database import connect
+    from stores.database import connect
 
     _DB_AVAILABLE = True
 except Exception:

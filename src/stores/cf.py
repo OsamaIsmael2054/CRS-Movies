@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import asyncpg
 
-from src.helpers.config import settings
+from helpers.config import settings
 
 # Sum positive-seed similarity minus disliked-seed similarity, drop seen items.
 _RECOMMEND_SQL = """

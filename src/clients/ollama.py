@@ -8,7 +8,7 @@ from langchain_core.messages import (
 )
 from langchain_ollama import ChatOllama
 
-from src.helpers.config import settings
+from helpers.config import settings
 
 _ROLE_TO_MESSAGE: dict[str, type[BaseMessage]] = {
     "system": SystemMessage,

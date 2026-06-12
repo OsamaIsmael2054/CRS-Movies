@@ -4,7 +4,7 @@ import asyncpg
 import numpy as np
 from scipy.sparse import csr_matrix
 
-from src.helpers.config import settings
+from helpers.config import settings
 
 
 async def _fetch_interactions(conn: asyncpg.Connection) -> list[asyncpg.Record]:

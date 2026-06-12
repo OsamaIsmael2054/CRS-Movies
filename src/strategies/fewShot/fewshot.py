@@ -1,9 +1,9 @@
 from typing import AsyncIterator
 
-from src.routes.schemes.chat import ChatRequest
-from src.strategies.base import RecommendationStrategy
-from src.strategies.common import build_user_message
-from src.strategies.fewShot.prompts import (
+from routes.schemes.chat import ChatRequest
+from strategies.base import RecommendationStrategy
+from strategies.common import build_user_message
+from strategies.fewShot.prompts import (
     FEWSHOT_BLOCK,
     FEWSHOT_EXAMPLE,
     SYSTEM_PROMPT,

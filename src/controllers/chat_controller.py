@@ -2,13 +2,13 @@ from typing import AsyncIterator
 
 import asyncpg
 
-from src.clients.ollama import OllamaClient
-from src.routes.schemes.chat import ChatMode, ChatRequest
-from src.strategies.agent.agent import AgentStrategy
-from src.strategies.base import RecommendationStrategy
-from src.strategies.fewShot.fewshot import FewShotStrategy
-from src.strategies.rag.rag import RagStrategy
-from src.stores.sessions import SessionStore
+from clients.ollama import OllamaClient
+from routes.schemes.chat import ChatMode, ChatRequest
+from strategies.agent.agent import AgentStrategy
+from strategies.base import RecommendationStrategy
+from strategies.fewShot.fewshot import FewShotStrategy
+from strategies.rag.rag import RagStrategy
+from stores.sessions import SessionStore
 
 
 class ChatController:

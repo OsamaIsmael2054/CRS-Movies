@@ -3,17 +3,17 @@ from typing import AsyncIterator
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessageChunk, HumanMessage
 
-from src.clients.ollama import OllamaClient
-from src.routes.schemes.chat import ChatRequest
-from src.strategies.agent.tools import (
+from clients.ollama import OllamaClient
+from routes.schemes.chat import ChatRequest
+from strategies.agent.tools import (
     create_recommend_tool,
     create_search_tool,
     create_similar_tool,
     create_similar_users_tool,
 )
-from src.strategies.base import RecommendationStrategy
-from src.strategies.agent.prompts import AGENT_SYSTEM_PROMPT
-from src.strategies.common import build_user_message
+from strategies.base import RecommendationStrategy
+from strategies.agent.prompts import AGENT_SYSTEM_PROMPT
+from strategies.common import build_user_message
 
 
 class AgentStrategy(RecommendationStrategy):

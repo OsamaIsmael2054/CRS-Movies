@@ -4,10 +4,10 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from src.clients.ollama import OllamaClient
-from src.controllers.chat_controller import ChatController
-from src.routes.chat import router as chat_router
-from src.stores.database import create_pool
+from clients.ollama import OllamaClient
+from controllers.chat_controller import ChatController
+from routes.chat import router as chat_router
+from stores.database import create_pool
 
 
 @asynccontextmanager

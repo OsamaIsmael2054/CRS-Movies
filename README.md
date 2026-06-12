@@ -44,8 +44,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # --- upload the dataset into Postgres + build CF similarity ---
-python -m src.stores.load        # applies db/schema.sql and bulk-loads all tables
-python -m src.stores.cf_build    # computes item-item similarity (item_similarity)
+python -m stores.load        # applies db/schema.sql and bulk-loads all tables
+python -m stores.cf_build    # computes item-item similarity (item_similarity)
 ```
 
 `load` prints the row counts per table; `cf_build` prints the number of
@@ -57,7 +57,7 @@ neighbor rows written. Both are re-runnable (the schema is dropped/recreated).
 
 ```bash
 source .venv/bin/activate
-uvicorn src.main:app --reload --port 8000
+uvicorn main:app --reload --port 8000
 ```
 
 **Or fully containerized** (builds the app image, reaches Ollama on the host):

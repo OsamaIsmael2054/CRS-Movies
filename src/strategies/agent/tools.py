@@ -1,8 +1,8 @@
 import asyncpg
 from langchain_core.tools import tool
 
-from src.stores.catalog import search_titles
-from src.stores.cf import Candidate, recommend, recommend_via_users, similar
+from stores.catalog import search_titles
+from stores.cf import Candidate, recommend, recommend_via_users, similar
 
 
 def _format(candidates: list[Candidate]) -> str:

@@ -3,9 +3,9 @@ from typing import AsyncIterator
 
 import asyncpg
 
-from src.clients.ollama import OllamaClient
-from src.routes.schemes.chat import ChatRequest
-from src.stores.sessions import SessionStore, Turn
+from clients.ollama import OllamaClient
+from routes.schemes.chat import ChatRequest
+from stores.sessions import SessionStore, Turn
 
 
 class RecommendationStrategy(ABC):

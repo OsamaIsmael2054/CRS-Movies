@@ -41,7 +41,7 @@ This is the door to the database.
 This script fills the database from the dataset files. Run it with:
 
 ```bash
-python -m src.stores.load
+python -m stores.load
 ```
 
 What it does, step by step:
@@ -66,7 +66,7 @@ also liked these". This script computes which movies are similar to which, and
 saves the result in the `item_similarity` table. Run it with:
 
 ```bash
-python -m src.stores.cf_build
+python -m stores.cf_build
 ```
 
 What it does:
@@ -107,8 +107,8 @@ strategies use the id after that.
 
 ```bash
 cd docker && docker compose up -d && cd ..   # 1. start Postgres
-python -m src.stores.load                     # 2. load the data (one time)
-python -m src.stores.cf_build                 # 3. build item_similarity (one time)
+python -m stores.load                     # 2. load the data (one time)
+python -m stores.cf_build                 # 3. build item_similarity (one time)
 ```
 
 After these three steps the database is ready and the app can serve

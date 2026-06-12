@@ -1,6 +1,6 @@
 import asyncpg
 
-from src.helpers.config import settings
+from helpers.config import settings
 
 
 async def create_pool(*, min_size: int = 1, max_size: int = 10) -> asyncpg.Pool:

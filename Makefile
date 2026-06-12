@@ -42,24 +42,24 @@ db-wait: ## Wait until PostgreSQL is healthy
 	@echo "Postgres is healthy."
 
 load: ## Load the dataset into PostgreSQL
-	$(PY) -m src.stores.load
+	$(PY) -m stores.load
 
 cf: ## Build item-item CF similarity
-	$(PY) -m src.stores.cf_build
+	$(PY) -m stores.cf_build
 
 data: db-up db-wait load cf ## Full DB setup: start DB, load dataset, build CF
 
 run: ## Start the API locally (uvicorn, reload)
-	$(UVICORN) src.main:app --reload --port 8000
+	$(UVICORN) main:app --reload --port 8000
 
 run-docker: env ## Start the full stack (DB + API) in docker
 	$(COMPOSE) --profile app up -d --build
 
 eval: ## Run the full evaluation table (sample=50)
-	$(PY) -m src.evaluation.evaluate --methods all --sample 50 --k 10
+	$(PY) -m evaluation.evaluate --methods all --sample 50 --k 10
 
 eval-cf: ## Fast CF-only baseline (sample=500)
-	$(PY) -m src.evaluation.evaluate --methods cf --sample 500 --k 10
+	$(PY) -m evaluation.evaluate --methods cf --sample 500 --k 10
 
 test: ## Run the test suite
 	$(PY) -m pytest -q

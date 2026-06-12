@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
-from src.controllers.chat_controller import ChatController
+from controllers.chat_controller import ChatController
 from .schemes.chat import ChatRequest
 
 router = APIRouter()
