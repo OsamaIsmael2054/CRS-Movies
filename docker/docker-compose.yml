@@ -15,8 +15,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # FastAPI app. Optional: only starts with `--profile app`, so the default
-  # `docker compose up -d` brings up just Postgres for loading the data.
   crs:
     build:
       context: ..
@@ -25,14 +23,13 @@ services:
     profiles: ["app"]
     restart: unless-stopped
     env_file:
-      - ./env/.env.postgres   # db credentials
-      - ./env/.env.app        # host overrides (postgres host, ollama url, model)
+      - ./env/.env.postgres
+      - ./env/.env.app
     ports:
       - "${APP_HOST_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
-    # Lets the container reach Ollama running on the host.
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

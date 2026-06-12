@@ -1,7 +1,3 @@
-"""Application settings, loaded from environment / docker env files."""
-
-from __future__ import annotations
-
 from functools import lru_cache
 from pathlib import Path
 
@@ -31,6 +27,7 @@ class Settings(BaseSettings):
 
     cf_top_m: int = 50
     cf_top_k: int = 20
+    cf_user_neighbors: int = 50
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "gemma4:12b"

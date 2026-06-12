@@ -1,3 +1,8 @@
+from enum import Enum
+
+from pydantic import BaseModel, Field
+
+
 class ChatMode(str, Enum):
     """Which CRS strategy handles the request."""
 

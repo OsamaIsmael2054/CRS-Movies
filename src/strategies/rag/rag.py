@@ -1,13 +1,3 @@
-"""Approach 2 — CF-grounded RAG.
-
-Retrieval is fixed and developer-controlled: we run the collaborative-filtering
-query exactly once, inject the resulting real catalog candidates into the
-prompt, then make a single streaming LLM call that re-ranks and explains them.
-This grounds the model in actual catalog items instead of parametric guesses.
-"""
-
-from __future__ import annotations
-
 from typing import AsyncIterator
 
 from src.routes.schemes.chat import ChatRequest

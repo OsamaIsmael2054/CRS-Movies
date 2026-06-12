@@ -1,11 +1,3 @@
-"""Prompts for Approach 2 — CF-grounded RAG.
-
-The model is grounded in real catalog candidates produced by the collaborative-
-filtering engine, and must recommend only from them.
-"""
-
-from __future__ import annotations
-
 RAG_SYSTEM_PROMPT = (
     "You are CineMate, a friendly movie recommendation assistant. You are given "
     "a shortlist of candidate movies selected for this user by a collaborative-"

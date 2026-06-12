@@ -1,11 +1,9 @@
 -- Movies-CRS schema. Re-runnable: drops then recreates everything.
 -- Derived from the LLM-Redial Movie dataset (item_map / user_ids /
--- final_data.jsonl / Conversation.txt). See plan.md for the source->table map.
+-- final_data.jsonl). See plan.md for the source->table map.
 
 DROP TABLE IF EXISTS item_similarity CASCADE;
 DROP TABLE IF EXISTS item_popularity CASCADE;
-DROP TABLE IF EXISTS conversation_items CASCADE;
-DROP TABLE IF EXISTS conversations CASCADE;
 DROP TABLE IF EXISTS user_might_like CASCADE;
 DROP TABLE IF EXISTS interactions CASCADE;
 DROP TABLE IF EXISTS items CASCADE;
@@ -38,25 +36,6 @@ CREATE TABLE user_might_like (
     item_id TEXT NOT NULL REFERENCES items(item_id),
     PRIMARY KEY (user_id, item_id)
 );
-
--- One row per conversation. conversation_id is the global dialogue index
--- shared with Conversation.txt; turn_index is its 1-based position for the user.
-CREATE TABLE conversations (
-    conversation_id INTEGER PRIMARY KEY,
-    user_id         TEXT NOT NULL REFERENCES users(user_id),
-    turn_index      INTEGER NOT NULL,
-    dialogue        TEXT
-);
-CREATE INDEX idx_conversations_user ON conversations(user_id);
-
--- Normalized user_likes / user_dislikes / rec_item per conversation.
-CREATE TABLE conversation_items (
-    conversation_id INTEGER NOT NULL REFERENCES conversations(conversation_id),
-    item_id         TEXT NOT NULL REFERENCES items(item_id),
-    role            TEXT NOT NULL CHECK (role IN ('like', 'dislike', 'rec')),
-    PRIMARY KEY (conversation_id, item_id, role)
-);
-CREATE INDEX idx_conversation_items_role ON conversation_items(role);
 
 -- Derived: how many distinct users interacted with each item (cold-start fallback).
 CREATE TABLE item_popularity (

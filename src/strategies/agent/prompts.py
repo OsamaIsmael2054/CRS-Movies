@@ -1,11 +1,3 @@
-"""Prompts for Approach 3 — the tool-calling agent.
-
-The model decides when/how to retrieve via the SQL-backed tools, then answers
-grounded in what the tools returned.
-"""
-
-from __future__ import annotations
-
 AGENT_SYSTEM_PROMPT = (
     "You are CineMate, a friendly movie recommendation assistant with access to "
     "tools backed by a real movie database. Your two main recommendation tools "

@@ -1,12 +1,8 @@
-"""The /chat endpoint: one entry point, strategy chosen via `mode`."""
-
-from __future__ import annotations
-
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
 from src.controllers.chat_controller import ChatController
-from src.models.chat import ChatRequest
+from .schemes.chat import ChatRequest
 
 router = APIRouter()
 

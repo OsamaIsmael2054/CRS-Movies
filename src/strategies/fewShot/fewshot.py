@@ -1,16 +1,3 @@
-"""Approach 1 — Few-shot baseline.
-
-No retrieval of candidates: the model recommends from its parametric memory,
-primed with one fixed dataset conversation as a few-shot demonstration plus the
-user's watched titles. A single streaming LLM call. This establishes the floor
-that the CF-grounded approaches are measured against.
-
-(The DB is touched only to resolve the user's history ids to titles — not to
-retrieve recommendations.)
-"""
-
-from __future__ import annotations
-
 from typing import AsyncIterator
 
 from src.routes.schemes.chat import ChatRequest

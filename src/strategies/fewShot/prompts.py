@@ -1,11 +1,3 @@
-"""Prompts for Approach 1 — the few-shot baseline.
-
-The model recommends from its parametric memory, primed with one fixed dataset
-conversation as a demonstration. No retrieval, no candidates.
-"""
-
-from __future__ import annotations
-
 SYSTEM_PROMPT = (
     "You are CineMate, a friendly and knowledgeable movie recommendation "
     "assistant. Based on the movies a user has watched and what they tell you "

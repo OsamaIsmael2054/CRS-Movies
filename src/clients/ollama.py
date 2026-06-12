@@ -1,9 +1,20 @@
-import json
-from typing import Any, AsyncIterator
+from typing import AsyncIterator
 
-import httpx
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+    SystemMessage,
+)
+from langchain_ollama import ChatOllama
 
 from src.helpers.config import settings
+
+_ROLE_TO_MESSAGE: dict[str, type[BaseMessage]] = {
+    "system": SystemMessage,
+    "user": HumanMessage,
+    "assistant": AIMessage,
+}
 
 
 class OllamaClient:
@@ -12,7 +23,6 @@ class OllamaClient:
         *,
         base_url: str | None = None,
         model: str | None = None,
-        timeout: float | None = None,
         temperature: float | None = None,
         think: bool | str | None = None,
     ) -> None:
@@ -22,97 +32,33 @@ class OllamaClient:
             temperature if temperature is not None else settings.ollama_temperature
         )
         self.think = think if think is not None else settings.ollama_think
-        self._client = httpx.AsyncClient(
+        # ChatOllama's ``reasoning`` flag maps to Ollama's ``think``; gemma needs
+        # it off (it streams no content otherwise), which our default encodes as
+        # ``think=False``. A non-bool ``think`` leaves the model default in place.
+        self._chat = ChatOllama(
+            model=self.model,
             base_url=self.base_url,
-            timeout=timeout or settings.ollama_timeout,
+            temperature=self.temperature,
+            reasoning=self.think if isinstance(self.think, bool) else None,
         )
 
-    async def aclose(self) -> None:
-        await self._client.aclose()
+    @property
+    def chat_model(self) -> ChatOllama:
+        """The underlying ChatOllama, for callers that need it (e.g. the agent)."""
+        return self._chat
 
-    async def __aenter__(self) -> "OllamaClient":
-        return self
-
-    async def __aexit__(self, *_exc: object) -> None:
-        await self.aclose()
-
-    def _options(self, overrides: dict[str, Any] | None) -> dict[str, Any]:
-        options = {"temperature": self.temperature}
-        if overrides:
-            options.update(overrides)
-        return options
-
-    async def stream_generate(
-        self,
-        prompt: str,
-        *,
-        system: str | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> AsyncIterator[str]:
-        payload: dict[str, Any] = {
-            "model": self.model,
-            "prompt": prompt,
-            "stream": True,
-            "think": self.think,
-            "options": self._options(options),
-        }
-        if system:
-            payload["system"] = system
-        async for chunk in self._stream("/api/generate", payload, key="response"):
-            yield chunk
+    @staticmethod
+    def _to_messages(messages: list[dict[str, str]]) -> list[BaseMessage]:
+        """Convert role/content dicts into LangChain message objects."""
+        return [
+            _ROLE_TO_MESSAGE.get(m["role"], HumanMessage)(content=m["content"])
+            for m in messages
+        ]
 
     async def stream_chat(
-        self,
-        messages: list[dict[str, Any]],
-        *,
-        options: dict[str, Any] | None = None,
+        self, messages: list[dict[str, str]]
     ) -> AsyncIterator[str]:
-        payload: dict[str, Any] = {
-            "model": self.model,
-            "messages": messages,
-            "stream": True,
-            "think": self.think,
-            "options": self._options(options),
-        }
-        async for chunk in self._stream("/api/chat", payload, key="message"):
-            yield chunk
-
-    async def chat(
-        self,
-        messages: list[dict[str, Any]],
-        *,
-        tools: list[dict[str, Any]] | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> dict[str, Any]:
-        payload: dict[str, Any] = {
-            "model": self.model,
-            "messages": messages,
-            "stream": False,
-            "think": self.think,
-            "options": self._options(options),
-        }
-        if tools:
-            payload["tools"] = tools
-        resp = await self._client.post("/api/chat", json=payload)
-        resp.raise_for_status()
-        return resp.json().get("message", {})
-
-    async def _stream(
-        self, path: str, payload: dict[str, Any], *, key: str
-    ) -> AsyncIterator[str]:
-        async with self._client.stream("POST", path, json=payload) as resp:
-            resp.raise_for_status()
-            async for line in resp.aiter_lines():
-                if not line:
-                    continue
-                data = json.loads(line)
-                if "error" in data:
-                    raise RuntimeError(f"Ollama error: {data['error']}")
-                if key == "message":
-                    chunk = (data.get("message") or {}).get("content", "")
-                else:
-                    chunk = data.get(key, "")
-                if chunk:
-                    yield chunk
-                if data.get("done"):
-                    break
+        """Stream a chat completion token-by-token as plain text."""
+        async for chunk in self._chat.astream(self._to_messages(messages)):
+            if chunk.content:
+                yield str(chunk.content)

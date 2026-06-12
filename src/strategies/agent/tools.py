@@ -1,13 +1,3 @@
-"""SQL/CF-backed tools for the LangChain agent.
-
-Each tool is built by a factory bound to one request (the asyncpg pool plus the
-user's watch history), so the model can act on catalog and CF data without being
-handed the user's context up front — it just decides when to call them. All
-retrieval goes through the same ``src.stores`` helpers the other strategies use.
-"""
-
-from __future__ import annotations
-
 import asyncpg
 from langchain_core.tools import tool
 

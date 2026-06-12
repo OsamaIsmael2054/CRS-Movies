@@ -92,10 +92,8 @@ strategy. Responses stream token-by-token.
 
 ## Two prompt changes that increase recommendation accuracy
 
-Both changes are applied to the **RAG** prompt (where the model re-ranks a fixed
-CF candidate list) and are evaluated as an ablation in via the `rag_dislike`
-and `rag_cot` methods, measured against the plain `rag` baseline with Recall@k /
-Hit@k / NDCG@k on held-out conversations.
+Both changes are applied to the **RAG** prompt, where the model re-ranks a fixed
+CF candidate list.
 
 ### 1. Explicit dislike-avoidance (negative signal in the prompt)
 
@@ -110,10 +108,10 @@ the model can surface candidates that match a liked theme but collide with a
 known dislike (e.g. recommending a slasher to someone who liked thrillers but
 dislikes horror). Stating the negatives turns a one-sided preference signal into
 a two-sided one: the model actively prunes near-misses, which removes
-false-positive recommendations from the top-k and lifts precision/recall at the
-cutoff. (In the retrieval layer the same dislikes also subtract `item_similarity`
-mass via `cf.recommend(..., disliked_ids=...)`, so the prompt change and the
-candidate set are consistent.)
+false-positive recommendations from the shortlist. (In the retrieval layer the
+same dislikes also subtract `item_similarity` mass via
+`cf.recommend(..., disliked_ids=...)`, so the prompt change and the candidate set
+are consistent.)
 
 ### 2. Chain-of-thought before choosing
 
@@ -128,8 +126,7 @@ unordered with respect to the user's stated taste. Forcing the model to first
 articulate *why* each candidate fits (genre/era/style) makes the final ranking a
 consequence of explicit comparison rather than position or surface salience. This
 reduces arbitrary selection among similar candidates and pushes the genuinely
-best-matching item higher, improving NDCG@k in particular (rank-sensitive),
-alongside Recall/Hit@k.
+best-matching item higher.
 
 > Note: these are *prompt-level* CoT instructions, distinct from the model's
 > native reasoning, which is disabled (`ollama_think=False`) so content streams
