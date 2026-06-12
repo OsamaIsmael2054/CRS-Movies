@@ -21,9 +21,6 @@ class. It gives them the model, the database, and a small helper called
 the user can read it while it is still being written.
 
 ## The three strategies
-
-We go from simple to smart. Each one adds something new.
-
 ### 1. Few-shot (the simple one) — `fewShot/`
 
 This is the baseline. It does **not** look in the database for movies. It only
@@ -31,17 +28,12 @@ uses what the model already knows from its training. We give the model one
 example conversation to show it the good style, plus the list of movies the user
 watched. Then the model answers in one call.
 
-This is the floor. It shows us how good the model is **alone**, with no help.
-
 ### 2. RAG (the grounded one) — `rag/`
 
 RAG means "get data first, then write the answer". Here the code runs the
 **collaborative filtering** (CF) search one time. CF looks at the movies the user
 watched and finds good candidate movies from real data. We put these real movies
 into the prompt, and the model picks the best ones and explains them in one call.
-
-The important point: **the code decides** what to search. The model only chooses
-from the list we give it. So it can not invent fake movies.
 
 ### 3. Agent (the smart one) — `agent/`
 
@@ -77,12 +69,3 @@ It never invents a title.
 RAG searches one time and the **code** controls it (get data, then answer). The
 agent searches when **it** wants and controls it by itself (think, act, look,
 repeat).
-
-## Why three strategies
-
-Having three lets us measure each step:
-- Few-shot shows the model with **no help**.
-- RAG shows the model **with real data** added by the code.
-- Agent shows the model **using the data by itself**.
-
-Same job, same metric, so we can clearly see what each part adds.

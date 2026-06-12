@@ -7,15 +7,16 @@ from src.strategies.rag.prompts import RAG_SYSTEM_PROMPT, build_rag_user_message
 
 
 class RagStrategy(RecommendationStrategy):
-    async def _candidates(self, request: ChatRequest) -> list[str]:
-        """CF candidate titles for the request (popularity fallback on cold start)."""
+    async def _candidates(self, history: list[str]) -> list[str]:
+        """CF candidate titles for the history (popularity fallback on cold start)."""
         async with self.pool.acquire() as conn:
-            candidates = await recommend(conn, history_ids=request.history)
+            candidates = await recommend(conn, history_ids=history)
         return [c.title for c in candidates]
 
     async def stream(self, request: ChatRequest) -> AsyncIterator[str]:
-        watched = await self._titles(request.history)
-        candidates = await self._candidates(request)
+        history = await self._history(request.user_id)
+        watched = await self._titles(history)
+        candidates = await self._candidates(history)
 
         messages = [
             {"role": "system", "content": RAG_SYSTEM_PROMPT},

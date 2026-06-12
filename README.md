@@ -9,12 +9,12 @@ CF-generated candidate set. Three approaches are implemented — few-shot (`POST
 
 ## Documentation
 
-More detailed, easy-to-read docs live next to the code they describe:
+For more detailed:
 
-- [`src/stores/Database.md`](src/stores/Database.md) — how the database is built:
+- [`Database.md`](src/stores/Database.md) — how the database is built:
   the tables, loading the dataset (`load.py`), building the CF similarity
   (`cf_build.py`), and the read functions used at query time.
-- [`src/strategies/Stratigies.md`](src/strategies/Stratigies.md) — the three
+- [`Stratigies.md`](src/strategies/Stratigies.md) — the three
   recommendation strategies (few-shot, RAG, agent), the agent's tools, and how
   they differ.
 
@@ -22,12 +22,8 @@ More detailed, easy-to-read docs live next to the code they describe:
 
 - **Python 3.13** (the project targets 3.13; 3.10+ works).
 - **Docker** + Docker Compose (runs PostgreSQL 18).
-- **[Ollama](https://ollama.com)** running locally on `:11434` with a model
+- **Ollama** running locally on `:11434` with a model
   pulled (default `gemma4:12b`).
-
-```bash
-ollama pull gemma4:12b      # then make sure `ollama serve` is running
-```
 
 ## 1. Start and load the database
 
@@ -81,14 +77,14 @@ curl -N -X POST http://localhost:8000/chat \
   -H 'Content-Type: application/json' \
   -d '{
         "message": "I love old classic musicals. What should I watch next?",
-        "history": ["6300159140", "6300215695", "6301977343"],
         "user_id": "A30Q8X8B1S3GGT",
         "mode": "rag"
       }'
 ```
 
-`history` is a list of catalog item ids the user has watched; `mode` selects the
-strategy. Responses stream token-by-token.
+The request carries only `user_id` (the server looks that user's watch history
+up itself) and `mode` (which selects the strategy). Responses stream
+token-by-token.
 
 ## Two prompt changes that increase recommendation accuracy
 

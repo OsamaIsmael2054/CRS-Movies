@@ -23,6 +23,20 @@ class RecommendationStrategy(ABC):
         """Yield response text chunks for the given request."""
         ...
 
+    async def _history(self, user_id: str | None) -> list[str]:
+        """Fetch the item ids this user has watched, from the interaction matrix.
+
+        Unknown / missing users yield an empty history (cold start), which the
+        CF layer handles via its popularity fallback.
+        """
+        if not user_id:
+            return []
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(
+                "SELECT item_id FROM interactions WHERE user_id = $1", user_id
+            )
+        return [r["item_id"] for r in rows]
+
     async def _titles(self, item_ids: list[str]) -> list[str]:
         """Resolve catalog item ids to titles, preserving input order."""
         if not item_ids:

@@ -17,14 +17,15 @@ from src.strategies.common import build_user_message
 
 class AgentStrategy(RecommendationStrategy):
     async def stream(self, request: ChatRequest) -> AsyncIterator[str]:
-        watched = await self._titles(request.history)
+        history = await self._history(request.user_id)
+        watched = await self._titles(history)
 
         # Tools bind this request's pool + history, so the agent is per-request.
         agent = create_agent(
             model=self.llm.chat_model,
             tools=[
-                create_recommend_tool(self.pool, request),
-                create_similar_users_tool(self.pool, request),
+                create_recommend_tool(self.pool, history),
+                create_similar_users_tool(self.pool, history),
                 create_search_tool(self.pool),
                 create_similar_tool(self.pool),
             ],

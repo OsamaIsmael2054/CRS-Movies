@@ -8,6 +8,10 @@ tqdm
 fastapi
 uvicorn[standard]
 
+# Streamlit test UI (streamlit_app.py)
+streamlit
+requests
+
 langchain>=1.3.8
 langchain-ollama>=1.1.0
 langgraph>=1.2.4

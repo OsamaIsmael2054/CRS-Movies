@@ -12,7 +12,8 @@ from src.strategies.fewShot.prompts import (
 
 class FewShotStrategy(RecommendationStrategy):
     async def stream(self, request: ChatRequest) -> AsyncIterator[str]:
-        watched = await self._titles(request.history)
+        history = await self._history(request.user_id)
+        watched = await self._titles(history)
 
         system = f"{SYSTEM_PROMPT}\n\n{FEWSHOT_BLOCK.format(example=FEWSHOT_EXAMPLE)}"
 

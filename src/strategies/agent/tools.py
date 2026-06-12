@@ -1,7 +1,6 @@
 import asyncpg
 from langchain_core.tools import tool
 
-from src.routes.schemes.chat import ChatRequest
 from src.stores.catalog import search_titles
 from src.stores.cf import Candidate, recommend, recommend_via_users, similar
 
@@ -16,7 +15,7 @@ def _format(candidates: list[Candidate]) -> str:
     )
 
 
-def create_recommend_tool(pool: asyncpg.Pool, request: ChatRequest):
+def create_recommend_tool(pool: asyncpg.Pool, history: list[str]):
     """Build the CF candidate tool bound to this request's pool and history."""
 
     @tool
@@ -29,7 +28,7 @@ def create_recommend_tool(pool: asyncpg.Pool, request: ChatRequest):
         seed_item_ids (catalog ids) to seed from specific movies. Returns a
         newline-separated shortlist of real catalog titles to recommend from.
         """
-        seeds = seed_item_ids or request.history
+        seeds = seed_item_ids or history
         async with pool.acquire() as conn:
             candidates = await recommend(conn, history_ids=seeds, k=k)
         return _format(candidates)
@@ -37,7 +36,7 @@ def create_recommend_tool(pool: asyncpg.Pool, request: ChatRequest):
     return recommend_candidates
 
 
-def create_similar_users_tool(pool: asyncpg.Pool, request: ChatRequest):
+def create_similar_users_tool(pool: asyncpg.Pool, history: list[str]):
     """Build the user-based CF tool: recommend what *similar users* watched."""
 
     @tool
@@ -55,7 +54,7 @@ def create_similar_users_tool(pool: asyncpg.Pool, request: ChatRequest):
         recommend_candidates. Returns a newline-separated shortlist of real
         catalog titles.
         """
-        seeds = seed_item_ids or request.history
+        seeds = seed_item_ids or history
         async with pool.acquire() as conn:
             candidates = await recommend_via_users(conn, history_ids=seeds, k=k)
         return _format(candidates)
